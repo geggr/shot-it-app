@@ -1,5 +1,5 @@
-import type {VideoHttpClient} from "~/http/video.http-client";
-import type {Video} from "~/@types/video";
+import type {AuthenticationResponse, SignInRequest, VideoHttpClient} from "~/http/video.http-client";
+import type {Video, VideoTags} from "~/@types/video";
 
 type ShotitVideoHttpClientConstructor = {
     endpoint: string
@@ -12,6 +12,38 @@ export class ShotitVideoHttpClient implements VideoHttpClient {
     constructor({ endpoint }: ShotitVideoHttpClientConstructor) {
         this.#endpoint = endpoint
         this.#base_uri = endpoint.concat("/api/videos")
+    }
+
+    async login(request: SignInRequest) {
+        const response = await fetch(this.#endpoint.concat("/api/auth/sign-in"), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(request)
+        })
+
+        const json = await response.json() as AuthenticationResponse
+
+        localStorage.setItem("token", json.token)
+    }
+
+    async register(request: FormData) {
+        await fetch(this.#endpoint.concat("/api/auth/sign-up"), {
+            method: "POST",
+            body: request
+        })
+    }
+
+    async fetchAllTags(): Promise<VideoTags[]> {
+        const response = await fetch(this.#endpoint.concat("/api/tags"), {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        })
+
+        return await response.json() as VideoTags[]
     }
 
     async fetchAllVideos(): Promise<Video[]> {
@@ -63,6 +95,20 @@ export class ShotitVideoHttpClient implements VideoHttpClient {
                 "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({ title })
+        })
+    }
+
+    async changeVideoTags(id: number, tags: string[]) {
+        const token = localStorage.getItem("token")
+        const resource = this.#base_uri.concat("/").concat(String(id)).concat("/tags")
+
+        await fetch(resource, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ tagIds: tags  })
         })
     }
 

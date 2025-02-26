@@ -5,6 +5,8 @@ import {VideoGalleryTagsFilter} from "~/pages/dashboard/video-gallery-tags";
 import {Avatar, AvatarFallback, AvatarImage} from "~/components/ui/avatar";
 import { VideoGalleryStatusFilter} from "~/pages/dashboard/video-gallery-status";
 import {ShotitVideoHttpClient} from "~/http/shotit-video.http-client";
+import {useState} from "react";
+import type {VideoTags} from "~/@types/video";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -17,17 +19,12 @@ export function meta({}: Route.MetaArgs) {
 const client = new ShotitVideoHttpClient({ endpoint: "http://localhost:8080" })
 
 export async function clientLoader({}: Route.ClientLoaderArgs) {
-    return await client.fetchAllVideos()
+    const videos = await client.fetchAllVideos()
+    const tags = await client.fetchAllTags()
+
+    return { videos, tags }
 }
 
-function GalleryFilters() {
-    return (
-        <div>
-            <VideoGalleryStatusFilter/>
-            <VideoGalleryTagsFilter/>
-        </div>
-    )
-}
 
 function DashboardHeader(){
     return (
@@ -41,9 +38,7 @@ function DashboardHeader(){
                         <AvatarImage src="http://localhost:5000"/>
                         <AvatarFallback>GG</AvatarFallback>
                     </Avatar>
-
                 </div>
-
             </div>
         </div>
     )
@@ -53,6 +48,23 @@ export default function Dashboard({loaderData}: Route.ComponentProps) {
     if (!loaderData) {
         return <h1> Carregando videos...</h1>
     }
+
+    const [ filter, setFilter ] = useState<string[]>([])
+
+    function changeActiveFilters(tag: VideoTags, checked: boolean){
+        if (checked) {
+            setFilter([...filter, tag.name])
+        }
+        else {
+            setFilter(
+                filter.filter(it => it !== tag.name)
+            )
+        }
+    }
+
+    const videos = (filter.length === 0)
+        ? loaderData.videos
+        : loaderData.videos.filter(it => it.tags.find(t => filter.includes(t.name)))
 
     return (
         <div className="w-full h-full">
@@ -64,9 +76,12 @@ export default function Dashboard({loaderData}: Route.ComponentProps) {
                     </h1>
                     <UploadVideoDialog/>
                 </div>
-                <div className="flex gap-10">
-                    <GalleryFilters/>
-                    <VideoGallery videos={loaderData}/>
+                <div className="w-full grid grid-cols-[120px_1fr] gap-10">
+                    <div>
+                        <VideoGalleryStatusFilter/>
+                        <VideoGalleryTagsFilter tags={loaderData.tags} handleSelectedTag={changeActiveFilters}/>
+                    </div>
+                    <VideoGallery videos={videos}/>
                 </div>
             </main>
         </div>

@@ -20,7 +20,7 @@ const VIDEO_BADGE = [
 
 export function VideoGalleryStatusFilter() {
     return (
-        <div className="w-32 mb-8 border-t border-zinc-800 shrink-0">
+        <div className="w-full mb-8 border-t border-zinc-800 shrink-0">
             <h1 className="py-4 font-bold">
                 Status
             </h1>

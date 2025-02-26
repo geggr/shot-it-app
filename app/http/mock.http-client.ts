@@ -1,5 +1,5 @@
-import type {VideoHttpClient} from "~/http/video.http-client";
-import type {Video} from "~/@types/video";
+import type {SignInRequest, VideoHttpClient} from "~/http/video.http-client";
+import type {Video, VideoTags} from "~/@types/video";
 
 const MOCK : Video[] = [
     {
@@ -19,7 +19,8 @@ const MOCK : Video[] = [
                 "id": 3,
                 "url": "http://localhost:4566/shotit/video-1740274454891_3.png"
             }
-        ]
+        ],
+        tags: []
     },
     {
         "id": 3,
@@ -38,7 +39,8 @@ const MOCK : Video[] = [
                 "id": 6,
                 "url": "http://localhost:4566/shotit/video-1740417220481_3.png"
             }
-        ]
+        ],
+        tags: []
     },
     {
         "id": 4,
@@ -57,7 +59,8 @@ const MOCK : Video[] = [
                 "id": 9,
                 "url": "http://localhost:4566/shotit/video-1740417250771_3.png"
             }
-        ]
+        ],
+        tags: []
     },
     {
         "id": 5,
@@ -76,7 +79,8 @@ const MOCK : Video[] = [
                 "id": 12,
                 "url": "http://localhost:4566/shotit/video-1740429989291_3.png"
             }
-        ]
+        ],
+        tags: []
     },
     {
         "id": 6,
@@ -95,14 +99,28 @@ const MOCK : Video[] = [
                 "id": 15,
                 "url": "http://localhost:4566/shotit/video-1740430064942_3.png"
             }
-        ]
+        ],
+        tags: []
     }
 ]
 
 export class MockHttpClient implements VideoHttpClient {
 
+    async fetchAllTags(): Promise<VideoTags[]> {
+        return Promise.resolve(undefined as unknown as VideoTags[])
+    }
+
     async fetchAllVideos(){
         return Promise.resolve(MOCK)
+    }
+
+    async register(request: FormData): Promise<void> {
+    }
+
+    async login(request: SignInRequest): Promise<void> {
+    }
+
+    async changeVideoTags(id: number, tags: string[]): Promise<void> {
     }
 
     async fetchVideo(id: number){

@@ -14,7 +14,9 @@ import {useActionState, useRef, useState} from "react";
 let http = new ShotitVideoHttpClient({ endpoint: "http://localhost:8080" })
 
 export async function clientLoader() {
-    return await http.fetchVideo(3)
+    const video = await http.fetchVideo(3)
+    const tags = await http.fetchAllTags()
+    return { video, tags }
 }
 
 function ProjectHeader({ id, title }: { id: number, title: string }) {
@@ -66,7 +68,10 @@ function ProjectHeader({ id, title }: { id: number, title: string }) {
 }
 
 
-export default function VideoDetails({loaderData: video}: Route.ComponentProps) {
+export default function VideoDetails({ loaderData }: Route.ComponentProps) {
+
+    const video = loaderData.video
+    const tags = loaderData.tags
 
     if (!video) {
         return (<h1> Carregando Video... </h1>)
@@ -84,7 +89,7 @@ export default function VideoDetails({loaderData: video}: Route.ComponentProps) 
 
                 <div className="grid grid-cols-3 items-center w-full gap-4">
                     <VideoPreview video={video}/>
-                    <VideoDetailsForm/>
+                    <VideoDetailsForm video={video} tags={tags}/>
                 </div>
 
                 <h1 className="text-2xl font-black my-4"> Thumbnails </h1>

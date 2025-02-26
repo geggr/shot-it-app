@@ -233,6 +233,10 @@ html, body {
     @apply min-h-[300px] w-full h-full bg-zinc-700 rounded-md relative;
 }
 
+.video-card__thumb {
+    @apply min-w-[500px];
+}
+
 .video-card:hover .video-card__thumb {
     filter: blur(2px);
 }
@@ -265,4 +269,24 @@ html, body {
     display: block;
     font-size: 1.85rem;
     font-weight: bold;
+}
+
+#login {
+    height: 100%;
+    padding: 50px;
+    display: grid;
+    grid-template-columns: 800px 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+}
+
+#login-background {
+    height: 90%;
+    width: 800px;
+    border-radius: 10px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-position: center;
+    background-image: url('/public/login-page.jpg');
 }
