@@ -11,6 +11,7 @@ export type VideoTags = {
 export type Video = {
     id: number,
     name: string,
+    status: 'PENDING' | 'SUCCESS' | 'FAILED'
     url: string,
     thumbnails: VideoThumbnail[]
     tags: VideoTags[]

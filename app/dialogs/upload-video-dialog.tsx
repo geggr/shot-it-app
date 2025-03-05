@@ -1,4 +1,4 @@
-import {useActionState} from "react";
+import {useActionState, useState} from "react";
 import {useNavigate} from "react-router";
 
 import {
@@ -13,21 +13,33 @@ import { Button } from "~/components/ui/button";
 import {Label} from "~/components/ui/label";
 import {Input} from "~/components/ui/input";
 import {MockHttpClient} from "~/http/mock.http-client";
+import {http} from "~/http/default.http.client";
+import {S3HttpClient} from "~/http/s3.http-client";
 
-const client = new MockHttpClient();
+type UploadVideoDialogProps = {
+    onFinishUpload: (total: number) => void
+}
 
-export function UploadVideoDialog() {
-    const navigate = useNavigate()
+const wait = () => new Promise(resolve => setTimeout(resolve, 5000))
+
+const s3 = new S3HttpClient()
+
+export function UploadVideoDialog({ onFinishUpload }: UploadVideoDialogProps) {
+    const [open, setOpen] = useState(false);
 
     const [state, formAction] = useActionState(
         async (previous: any, form: FormData) => {
-            await client.upload(form)
+            // await http.upload(form)
+            const signs = await http.presign(form)
+            setOpen(false)
+            await s3.upload(signs, form, (id) => http.emitUploadCompleted(id))
+            onFinishUpload(1)
         },
         null
     )
 
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button variant="outline" size="lg">Novo Video</Button>
             </DialogTrigger>
@@ -47,7 +59,7 @@ export function UploadVideoDialog() {
                             <Label htmlFor="file" className="text-right">
                                 Videos
                             </Label>
-                            <Input id="file" name="files" type="file" className="col-span-3"/>
+                            <Input id="file" name="files" type="file" accept="video/mp4" className="col-span-3" multiple={true}/>
                         </div>
                     </div>
                     <DialogFooter>

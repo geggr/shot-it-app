@@ -230,11 +230,11 @@ html, body {
 }
 
 .video-card {
-    @apply min-h-[300px] w-full h-full bg-zinc-700 rounded-md relative;
+    @apply h-[300px] w-full bg-zinc-700 rounded-md relative;
 }
 
 .video-card__thumb {
-    @apply min-w-[500px];
+    @apply min-w-[200px];
 }
 
 .video-card:hover .video-card__thumb {

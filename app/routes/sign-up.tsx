@@ -4,8 +4,8 @@ import { Button } from "~/components/ui/button";
 import { Link } from "react-router";
 import {useActionState, useState} from "react";
 import {ShotitVideoHttpClient} from "~/http/shotit-video.http-client";
+import {http} from "~/http/default.http.client";
 
-const http = new ShotitVideoHttpClient({ endpoint: "http://localhost:8080" });
 
 export default function SignInPage(){
     const [ profile, setProfile ] = useState<string | null>(null)

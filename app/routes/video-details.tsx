@@ -1,20 +1,18 @@
 import type {Route} from "./+types/video-details";
 import {VideoPreview} from "~/pages/video-details/video-preview";
-import {MockHttpClient} from "~/http/mock.http-client";
 import {ThumbnailCarousel} from "~/pages/video-details/thumbnail-carousel";
 import {Avatar, AvatarFallback, AvatarImage} from "~/components/ui/avatar";
 import {Link} from "react-router";
 import {ArrowLeft} from "lucide-react";
 import {Label} from "~/components/ui/label";
-import {Input} from "~/components/ui/input";
 import {VideoDetailsForm} from "~/pages/video-details/video-details-form";
-import {ShotitVideoHttpClient} from "~/http/shotit-video.http-client";
 import {useActionState, useRef, useState} from "react";
+import {http} from "~/http/default.http.client";
 
-let http = new ShotitVideoHttpClient({ endpoint: "http://localhost:8080" })
-
-export async function clientLoader() {
-    const video = await http.fetchVideo(3)
+export async function clientLoader({ request, params }: Route.ClientLoaderArgs) {
+    const video = await http.fetchVideo(
+        Number(params.videoId),
+    )
     const tags = await http.fetchAllTags()
     return { video, tags }
 }
@@ -35,7 +33,7 @@ function ProjectHeader({ id, title }: { id: number, title: string }) {
         <div className="shrink-0 h-[80px] w-full bg-zinc-950 mb-10">
             <div className="h-full w-full max-w-7xl flex items-center justify-between mx-auto">
 
-                <Link to="/">
+                <Link to="/dashboard">
                     <ArrowLeft size={30} color="white"/>
                 </Link>
 

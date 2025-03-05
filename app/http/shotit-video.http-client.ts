@@ -1,5 +1,7 @@
 import type {AuthenticationResponse, SignInRequest, VideoHttpClient} from "~/http/video.http-client";
 import type {Video, VideoTags} from "~/@types/video";
+import type {UserProfile} from "~/@types/user";
+import type {SignedVideoURL} from "~/@types/provider";
 
 type ShotitVideoHttpClientConstructor = {
     endpoint: string
@@ -12,6 +14,16 @@ export class ShotitVideoHttpClient implements VideoHttpClient {
     constructor({ endpoint }: ShotitVideoHttpClientConstructor) {
         this.#endpoint = endpoint
         this.#base_uri = endpoint.concat("/api/videos")
+    }
+
+    async dashboard(): Promise<UserProfile>{
+        return await fetch(this.#endpoint.concat("/api/profile"), {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                "Content-Type": "application/json",
+            },
+        }).then(res => res.json()) as UserProfile
     }
 
     async login(request: SignInRequest) {
@@ -40,6 +52,7 @@ export class ShotitVideoHttpClient implements VideoHttpClient {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             }
         })
 
@@ -52,10 +65,37 @@ export class ShotitVideoHttpClient implements VideoHttpClient {
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bearer ${localStorage.getItem("token")}`
-            }
+            },
         })
 
         return await response.json() as Video[];
+    }
+
+    async presign(form: FormData){
+        const files = form.getAll("files").map(file => (file as File).name)
+
+        const response = await fetch(this.#base_uri.concat("/sign"), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            body: JSON.stringify({ names: files })
+        })
+
+        return await response.json() as SignedVideoURL[];
+    }
+
+    async emitUploadCompleted(id: number){
+        const token = localStorage.getItem("token")
+
+        await fetch(this.#base_uri.concat("/").concat(String(id)).concat("/complete"), {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({})
+        })
     }
 
     async fetchVideo(id: number): Promise<Video> {
@@ -65,6 +105,7 @@ export class ShotitVideoHttpClient implements VideoHttpClient {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             }
         })
 
@@ -77,7 +118,6 @@ export class ShotitVideoHttpClient implements VideoHttpClient {
         await fetch(this.#base_uri, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
                 "Authorization": `Bearer ${token}`
             },
             body: form

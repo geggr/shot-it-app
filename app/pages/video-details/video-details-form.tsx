@@ -5,6 +5,8 @@ import type {Video, VideoTags} from "~/@types/video";
 import { Label } from "~/components/ui/label";
 import {useActionState, useState} from "react";
 import {ShotitVideoHttpClient} from "~/http/shotit-video.http-client";
+import { http } from "~/http/default.http.client";
+import {VideoBadge} from "~/components/video/video-badge";
 
 export function VideoTag({ tag, selected }: { tag: VideoTags, selected: boolean }) {
     const [ checked, setChecked ] = useState(selected);
@@ -26,7 +28,6 @@ export function VideoTag({ tag, selected }: { tag: VideoTags, selected: boolean 
         </Label>
     )
 }
-const http = new ShotitVideoHttpClient({ endpoint: 'http://localhost:8080' });
 
 export function VideoDetailsForm({ video, tags }: { video: Video, tags: VideoTags[] }) {
 
@@ -44,10 +45,7 @@ export function VideoDetailsForm({ video, tags }: { video: Video, tags: VideoTag
 
             <div className="flex flex-col gap-2">
                 <span className="font-bold">Status</span>
-                <div className="flex items-center gap-2">
-                    <div className={cn("ml-2 size-2 rounded-full", "bg-yellow-300")}/>
-                    Pendente
-                </div>
+                <VideoBadge badge={video.status} />
             </div>
 
             <div className="flex flex-col gap-2">
@@ -65,7 +63,7 @@ export function VideoDetailsForm({ video, tags }: { video: Video, tags: VideoTag
             <div className="flex flex-col gap-2">
                 <span className="font-bold">URL</span>
                 <div className="flex items-center gap-2">
-                <Input type="text" value="http://localhost:4566/32913123" readOnly={true}/>
+                <Input type="text" value={video.url} readOnly={true}/>
                     <Button variant="outline">
                         Copiar
                     </Button>

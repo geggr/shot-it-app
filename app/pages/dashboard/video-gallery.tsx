@@ -1,4 +1,5 @@
 import type {Video, VideoThumbnail} from "~/@types/video";
+import {Link} from "react-router";
 
 type VideoGalleryProps = {
     videos: Video[];
@@ -22,7 +23,9 @@ function VideoCard({ video } : { video: Video }) {
             <VideoCardThumbnail thumbnails={video.thumbnails}/>
             <div className="video-card__blur"></div>
             <div className="video-card__details">
-                <h1 className="text-white"> {video.name}</h1>
+                <Link to={`/video/${video.id}`}>
+                    <h1 className="text-white"> {video.name}</h1>
+                </Link>
             </div>
         </div>
     )

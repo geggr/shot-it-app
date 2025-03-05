@@ -5,7 +5,7 @@ export function VideoPreview({video}: { video: Video }) {
         <div
             className="w-[700px] col-start-1 col-end-3 flex flex-col items-center justify-center rounded">
             <video id="player" playsInline controls data-poster={`http://localhost:4566/shotit/${video.thumbnails.at(1)?.url}`}>
-                <source src={`http://localhost:4566/shotit/${video.url}`} type="video/mp4"/>
+                <source src={video.url} type="video/mp4"/>
             </video>
         </div>
     )

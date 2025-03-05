@@ -4,8 +4,7 @@ import { Button } from "~/components/ui/button";
 import {Form, Link, redirect} from "react-router";
 import type { Route } from "./+types/sign-in";
 import {ShotitVideoHttpClient} from "~/http/shotit-video.http-client";
-
-const http = new ShotitVideoHttpClient({ endpoint: 'http://localhost:8080' });
+import {http} from "~/http/default.http.client";
 
 export async function clientAction({ request }: Route.ClientActionArgs){
     let form = await request.formData()
