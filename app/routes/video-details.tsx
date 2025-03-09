@@ -8,6 +8,8 @@ import {Label} from "~/components/ui/label";
 import {VideoDetailsForm} from "~/pages/video-details/video-details-form";
 import {useActionState, useRef, useState} from "react";
 import {http} from "~/http/default.http.client";
+import {createTmpDownloadLink} from "~/utils/vanilla";
+import {Button} from "~/components/ui/button";
 
 export async function clientLoader({ request, params }: Route.ClientLoaderArgs) {
     const video = await http.fetchVideo(
@@ -75,6 +77,14 @@ export default function VideoDetails({ loaderData }: Route.ComponentProps) {
         return (<h1> Carregando Video... </h1>)
     }
 
+    async function handleDownloadThumbnail(){
+        const blob = await http.downloadThumbnails(video.id)
+        createTmpDownloadLink(
+            String(Date.now()),
+            blob
+        )
+    }
+
     return (
 
         <div className="h-full w-full flex flex-col">
@@ -83,7 +93,12 @@ export default function VideoDetails({ loaderData }: Route.ComponentProps) {
 
             <div className="w-full max-w-7xl mx-auto py-10">
 
-                <h1 className="text-2xl font-black my-4"> Seu video </h1>
+                <div className="flex justify-between">
+                    <h1 className="text-2xl font-black my-4"> Seu video </h1>
+                    <Button onClick={handleDownloadThumbnail}>
+                        Download Thumbnails
+                    </Button>
+                </div>
 
                 <div className="grid grid-cols-3 items-center w-full gap-4">
                     <VideoPreview video={video}/>

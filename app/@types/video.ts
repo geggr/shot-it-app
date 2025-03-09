@@ -16,3 +16,9 @@ export type Video = {
     thumbnails: VideoThumbnail[]
     tags: VideoTags[]
 }
+
+export type SignedVideoResponse = {
+    id: number,
+    url: string
+    filename: string
+}

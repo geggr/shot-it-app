@@ -8,6 +8,9 @@ import {useState} from "react";
 import type {Video, VideoTags, VideoThumbnail} from "~/@types/video";
 import { http } from "~/http/default.http.client";
 import type {UserProfile} from "~/@types/user";
+import {VideoGalleryEmptyState} from "~/pages/dashboard/video-gallery-empty";
+import type {SignedVideoURL} from "~/@types/provider";
+import {useSortedVideos} from "~/hooks/use-sorted-videos";
 
 
 export function meta({}: Route.MetaArgs) {
@@ -50,37 +53,23 @@ export default function Dashboard({loaderData}: Route.ComponentProps) {
         return <h1> Carregando videos...</h1>
     }
 
-    const [ videos, setVideos] = useState<Video[]>(loaderData.videos || []);
-    const [ filter, setFilter ] = useState<string[]>([])
+    const [videos, setVideos] = useState(loaderData.videos);
+    const [filtered, setCurrentStatus, setVideoFilter ] = useSortedVideos(videos)
 
-    function changeActiveFilters(tag: VideoTags, checked: boolean){
-        if (checked) {
-            setFilter([...filter, tag.name])
-        }
-        else {
-            setFilter(
-                filter.filter(it => it !== tag.name)
-            )
-        }
-    }
-
-    function handleAddPendingVideoToUpload(total: number){
+    function handleAddPendingVideoToUpload(uploaded: SignedVideoURL[]){
         // @ts-ignore
         setVideos([
             ...videos,
-            ...Array.from({ length: total }, () => ({
-                id: null,
-                name: "Pending Video",
-                url: "",
+            ...uploaded.map( it => ({
+                id: it.id,
+                name: it.filename,
+                url: it.url,
                 thumbnails: [],
-                tags: []
+                tags: [],
+                status: 'PENDING'
             }))
         ])
     }
-
-    const filtered = (filter.length === 0 || filter.length === 0)
-        ? videos
-        : videos.filter(it => it.tags.find(t => filter.includes(t.name)))
 
     return (
         <div className="w-full h-full">
@@ -88,16 +77,20 @@ export default function Dashboard({loaderData}: Route.ComponentProps) {
             <main className="flex flex-col items-center justify-center pb-4 max-w-7xl mx-auto">
                 <div className="w-full flex justify-between mb-6">
                     <h1 className="text-3xl font-black">
-                        Seus videos
+                        Dashboard.
                     </h1>
                     <UploadVideoDialog onFinishUpload={handleAddPendingVideoToUpload}/>
                 </div>
                 <div className="w-full grid grid-cols-[120px_1fr] gap-10">
                     <div>
-                        <VideoGalleryStatusFilter/>
-                        <VideoGalleryTagsFilter tags={loaderData.tags} handleSelectedTag={changeActiveFilters}/>
+                        <VideoGalleryStatusFilter handleSelectStatus={setCurrentStatus}/>
+                        <VideoGalleryTagsFilter tags={loaderData.tags} handleSelectedTag={setVideoFilter}/>
                     </div>
-                    <VideoGallery videos={filtered}/>
+                    { (filtered.length > 0)
+                        ? <VideoGallery videos={filtered}/>
+                        : <VideoGalleryEmptyState/>
+                    }
+
                 </div>
             </main>
         </div>

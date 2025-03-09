@@ -18,7 +18,10 @@ const VIDEO_BADGE = [
     },
 ]
 
-export function VideoGalleryStatusFilter() {
+type VideoGalleryStatusFilterProps = {
+    handleSelectStatus: (status: string) => void
+}
+export function VideoGalleryStatusFilter({ handleSelectStatus }: VideoGalleryStatusFilterProps) {
     return (
         <div className="w-full mb-8 border-t border-zinc-800 shrink-0">
             <h1 className="py-4 font-bold">
@@ -28,7 +31,7 @@ export function VideoGalleryStatusFilter() {
                 className="grid gap-4">
                 {
                     VIDEO_BADGE.map((status, index) => (
-                        <li key={index}
+                        <li key={index} onClick={() => handleSelectStatus(status.text)}
                             className="flex gap-2 px-2 py-1 items-center cursor-pointer rounded-md hover:bg-zinc-800">
                             <div className={cn("ml-2 size-2 rounded-full", status.background)}/>
                             <span className="text-gray-100">{status.text}</span>

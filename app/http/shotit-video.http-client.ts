@@ -86,6 +86,19 @@ export class ShotitVideoHttpClient implements VideoHttpClient {
         return await response.json() as SignedVideoURL[];
     }
 
+    async downloadThumbnails(id: number){
+        const token = localStorage.getItem("token")
+
+        const response = await fetch(this.#base_uri.concat("/").concat(String(id)).concat("/thumbnails/download"), {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+
+        return await response.blob()
+    }
+
     async emitUploadCompleted(id: number){
         const token = localStorage.getItem("token")
 

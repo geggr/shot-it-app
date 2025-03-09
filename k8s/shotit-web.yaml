@@ -1,0 +1,42 @@
+# Deploy da Aplicação React com React Router V7.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shotit-web
+  namespace: shotit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shotit-web
+  template:
+    metadata:
+      labels:
+        app: shotit-web
+    spec:
+      containers:
+        - name: shotit-web
+          image: shotit-web:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200M
+
+---
+# Load Balancer para permitir tráfego HTTP na aplicação
+apiVersion: v1
+kind: Service
+metadata:
+  name: shotit-web
+  namespace: shotit
+spec:
+  selector:
+    app: shotit-web
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer

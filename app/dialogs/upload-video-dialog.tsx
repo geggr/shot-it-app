@@ -12,12 +12,12 @@ import {
 import { Button } from "~/components/ui/button";
 import {Label} from "~/components/ui/label";
 import {Input} from "~/components/ui/input";
-import {MockHttpClient} from "~/http/mock.http-client";
 import {http} from "~/http/default.http.client";
 import {S3HttpClient} from "~/http/s3.http-client";
+import type {SignedVideoURL} from "~/@types/provider";
 
 type UploadVideoDialogProps = {
-    onFinishUpload: (total: number) => void
+    onFinishUpload: (total: SignedVideoURL[]) => void
 }
 
 const wait = () => new Promise(resolve => setTimeout(resolve, 5000))
@@ -31,9 +31,10 @@ export function UploadVideoDialog({ onFinishUpload }: UploadVideoDialogProps) {
         async (previous: any, form: FormData) => {
             // await http.upload(form)
             const signs = await http.presign(form)
+            s3.upload(signs, form, (id) => http.emitUploadCompleted(id)).catch(console.error)
+
             setOpen(false)
-            await s3.upload(signs, form, (id) => http.emitUploadCompleted(id))
-            onFinishUpload(1)
+            onFinishUpload(signs)
         },
         null
     )
